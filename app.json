@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "夜间补光灯",
+    "slug": "fill-light-tmp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.filllight.nightlamp",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/icon.png",
+        "monochromeImage": "./assets/icon.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "splash": {
+      "image": "./assets/icon.png",
+      "backgroundColor": "#EAF4FF",
+      "resizeMode": "contain"
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar"
+    ]
+  }
+}
