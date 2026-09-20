@@ -44,7 +44,7 @@ export const sheet = {
 
 export function clampSheetHeight(screenHeight: number): number {
   const target = screenHeight * sheet.heightRatio;
-  return Math.min(sheet.maxHeight, Math.max(sheet.minHeight, target));
+  return Math.min(sheet.maxHeight, Math.max(260, Math.min(target, screenHeight - 12)));
 }
 
 export const motion = {

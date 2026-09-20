@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Animated, Dimensions, PanResponder, ScrollView, StyleSheet, View } from 'react-native';
+import { Animated, Dimensions, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { clampSheetHeight, motion, radius, ui } from '../theme/tokens';
 import DragHandle from './DragHandle';
 import SegmentedTabs from './SegmentedTabs';
@@ -21,12 +21,23 @@ export default function ControlSheet() {
   const open = state.isSheetOpen;
   const height = clampSheetHeight(Dimensions.get('window').height);
   const [translate] = useState(() => new Animated.Value(height));
-  // PLAN §4：色轮 Tab 内容多（200dp 色盘 + 两个 Slider）时，Sheet 内部轻量滚动。
+  // PLAN §4：预设/色轮 Tab 内容超出时，Sheet 内部轻量滚动。
   // 仅内容高度超出视口才启用滚动，未溢出时行为与静态布局一致（不位移、不回弹）。
-  // 测量值按 Tab 打标：值不属于当前 Tab 即视为无效，无需副作用重置。
-  const isWheelTab = state.activeTab === 'wheel';
-  const [measure, setMeasure] = useState({ tab: '', viewportH: 0, contentH: 0 });
-  const scrollEnabled = measure.tab === state.activeTab && measure.contentH > measure.viewportH + 1;
+  // 两 Tab 共用同一 ScrollView：视口高度与 Tab 无关，两个测量值各写各的、互不覆盖。
+  const [measure, setMeasure] = useState({ viewportH: 0, contentH: 0 });
+  const [interacting, setInteracting] = useState(false);
+  const [interactionTick, setInteractionTick] = useState(0);
+  const beginInteraction = useCallback(() => setInteracting(true), []);
+  const endInteraction = useCallback(() => { setInteracting(false); setInteractionTick((n) => n + 1); }, []);
+  useEffect(() => {
+    if (!open || interacting) return;
+    const timer = setTimeout(() => dispatch({ type: 'SET_SHEET_OPEN', isSheetOpen: false }), 5000);
+    return () => clearTimeout(timer);
+  }, [dispatch, interacting, interactionTick, open]);
+  const scrollEnabled =
+    Number.isFinite(measure?.contentH) &&
+    Number.isFinite(measure?.viewportH) &&
+    measure.contentH > measure.viewportH + 1;
 
   useEffect(() => {
     Animated.timing(translate, {
@@ -107,6 +118,8 @@ export default function ControlSheet() {
         value={state.colorIntensity}
         onValueChange={onIntensityChange}
         onSlidingComplete={onIntensityComplete}
+        onInteractionStart={beginInteraction}
+        onInteractionEnd={endInteraction}
       />
       <View style={styles.gap} />
       <LabeledSlider
@@ -115,6 +128,8 @@ export default function ControlSheet() {
         value={state.screenBrightness}
         onValueChange={onBrightnessChange}
         onSlidingComplete={onBrightnessComplete}
+        onInteractionStart={beginInteraction}
+        onInteractionEnd={endInteraction}
       />
     </>
   );
@@ -128,12 +143,15 @@ export default function ControlSheet() {
           if (!p) return;
           // T036: 更新 target/source/presetId，保留 intensity；T054: 预设点击立即持久化
           dispatch({ type: 'SET_TARGET_COLOR', targetColor: p.color, colorSource: 'preset', presetId: p.id });
+          endInteraction();
           persistNow();
         }}
       />
     ) : (
       <ColorWheelPanel
         color={state.targetColor}
+        onInteractionStart={beginInteraction}
+        onInteractionEnd={endInteraction}
         onChange={(hex) =>
           dispatch({ type: 'SET_TARGET_COLOR', targetColor: hex, colorSource: 'custom', presetId: null })
         }
@@ -150,7 +168,7 @@ export default function ControlSheet() {
       // T032: Sheet 内手势自己消费，不冒泡到 Canvas
       onTouchStart={(e) => e.stopPropagation()}
     >
-      <View {...pan.panHandlers} testID="sheet-drag-zone">
+      <View {...pan.panHandlers} testID="sheet-drag-zone" onTouchStart={beginInteraction} onTouchEnd={endInteraction}>
         <DragHandle />
       </View>
       <View style={styles.body}>
@@ -162,39 +180,33 @@ export default function ControlSheet() {
           value={state.activeTab}
           // T041: 切 Tab 只 dispatch SET_ACTIVE_TAB，绝不改动当前颜色/强度。
           // Tab 持久化由 FillLightContext 的 debounce 效果（依赖 activeTab）承担（T054）。
-          onChange={(id) => dispatch({ type: 'SET_ACTIVE_TAB', activeTab: id as 'preset' | 'wheel' })}
+          onChange={(id) => { dispatch({ type: 'SET_ACTIVE_TAB', activeTab: id as 'preset' | 'wheel' }); endInteraction(); }}
         />
-        {isWheelTab ? (
-          <ScrollView
-            testID="sheet-scroll"
-            style={styles.fill}
-            scrollEnabled={scrollEnabled}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-            onLayout={(e) =>
-              setMeasure((m) => ({
-                tab: 'wheel',
-                viewportH: e.nativeEvent.layout.height,
-                contentH: m.tab === 'wheel' ? m.contentH : 0,
-              }))
-            }
-            onContentSizeChange={(_w, h) =>
-              setMeasure((m) => ({
-                tab: 'wheel',
-                viewportH: m.tab === 'wheel' ? m.viewportH : 0,
-                contentH: h,
-              }))
-            }
-          >
-            <View style={styles.panel}>{panel}</View>
-            {sliders}
-          </ScrollView>
-        ) : (
-          <View style={styles.fill}>
-            <View style={styles.panel}>{panel}</View>
-            {sliders}
-          </View>
-        )}
+        <ScrollView
+          testID="sheet-scroll"
+          style={styles.fill}
+          scrollEnabled={scrollEnabled}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          onTouchStart={beginInteraction}
+          onTouchEnd={endInteraction}
+          onTouchCancel={endInteraction}
+          onLayout={(e) => {
+            const layout = e?.nativeEvent?.layout;
+            if (!layout || !Number.isFinite(layout.height)) return;
+            setMeasure((m) => ({ ...m, viewportH: layout.height }));
+          }}
+          onContentSizeChange={(_w, h) => {
+            if (!Number.isFinite(h)) return;
+            setMeasure((m) => ({ ...m, contentH: h }));
+          }}
+        >
+          <View style={styles.panel}>{panel}</View>
+          {sliders}
+        </ScrollView>
+        <View style={styles.footer}>
+          <Pressable testID="reset-defaults" onPress={() => { dispatch({ type: 'RESET_DEFAULTS' }); persistNow(); endInteraction(); }} style={styles.reset}><Text style={styles.resetText}>恢复暖白默认</Text></Pressable>
+        </View>
       </View>
     </Animated.View>
   );
@@ -212,8 +224,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: ui.glassBorder,
   },
-  body: { flex: 1, paddingHorizontal: 20, paddingTop: 8, paddingBottom: 20 },
+  body: { flex: 1, paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
   fill: { flex: 1 },
   panel: { paddingTop: 12, minHeight: 170 },
   gap: { height: 12 },
+  footer: { paddingTop: 8 },
+  reset: { alignSelf: 'flex-end', paddingVertical: 7, paddingHorizontal: 10 },
+  resetText: { color: ui.accent, fontSize: 13, fontWeight: '600' },
 });

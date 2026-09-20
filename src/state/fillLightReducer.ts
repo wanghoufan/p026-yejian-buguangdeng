@@ -18,6 +18,12 @@ export function fillLightReducer(state: FillLightState, action: FillLightAction)
       return { ...state, activeTab: action.activeTab };
     case 'SET_SHEET_OPEN':
       return { ...state, isSheetOpen: action.isSheetOpen };
+    case 'RESET_DEFAULTS':
+      return {
+        ...state,
+        ...DEFAULT_STATE,
+        isHydrated: state.isHydrated,
+      };
     default:
       return state;
   }

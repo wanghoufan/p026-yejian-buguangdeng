@@ -48,6 +48,28 @@ describe('T055 persistence edge cases', () => {
     expect(next.targetColor).toBe('#FFD9E3');
   });
 
+  it('HYDRATE 完整恢复四个持久字段，并清空面板状态', () => {
+    const persisted = sanitizePersistedState({
+      targetColor: '#12ABEF',
+      colorIntensity: 0.35,
+      screenBrightness: 0.72,
+      activeTab: 'wheel',
+    });
+    const next = fillLightReducer(
+      {
+        ...initialState,
+        isSheetOpen: true,
+      },
+      { type: 'HYDRATE', state: persisted },
+    );
+
+    expect(next.targetColor).toBe('#12ABEF');
+    expect(next.colorIntensity).toBe(0.35);
+    expect(next.screenBrightness).toBe(0.72);
+    expect(next.activeTab).toBe('wheel');
+    expect(next.isSheetOpen).toBe(false);
+  });
+
   it('损坏 JSON 由调用方捕获：sanitize 对解析失败输入仍可用', () => {
     expect(() => sanitizePersistedState(JSON.parse('{{{'))).toThrow();
     expect(sanitizePersistedState(null).screenBrightness).toBe(1);

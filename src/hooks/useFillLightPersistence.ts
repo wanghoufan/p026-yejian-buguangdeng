@@ -23,10 +23,7 @@ export function useFillLightPersistence() {
 
   const saveNow = useCallback(async (state: FillLightState | PersistedFillLight): Promise<void> => {
     try {
-      const payload =
-        'targetColor' in state && !('isSheetOpen' in state)
-          ? sanitizePersistedState(state)
-          : toPersisted(state as FillLightState);
+      const payload = 'isSheetOpen' in state ? toPersisted(state as FillLightState) : state;
       await AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(payload));
     } catch {
       // 本地持久化失败静默忽略，不阻塞 UI

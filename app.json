@@ -3,7 +3,7 @@
     "name": "夜间补光灯",
     "slug": "fill-light-tmp",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "all",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {

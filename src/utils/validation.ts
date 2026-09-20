@@ -16,11 +16,12 @@ function toNum(v: unknown, fallback: number): number {
 
 export type PersistedFillLight = Pick<
   FillLightState,
-  'targetColor' | 'colorSource' | 'presetId' | 'colorIntensity' | 'screenBrightness' | 'activeTab'
+  'targetColor' | 'colorIntensity' | 'screenBrightness' | 'activeTab'
 >;
+type SanitizedFillLight = PersistedFillLight & Pick<FillLightState, 'colorSource' | 'presetId'>;
 
 /** T052: 校验 + 默认回退。任何非法字段回退到 DEFAULT_STATE 对应字段；整体非法输入回退默认。 */
-export function sanitizePersistedState(raw: unknown): PersistedFillLight {
+export function sanitizePersistedState(raw: unknown): SanitizedFillLight {
   const d = DEFAULT_STATE;
   if (typeof raw !== 'object' || raw === null) {
     return {
@@ -48,14 +49,10 @@ export function sanitizePersistedState(raw: unknown): PersistedFillLight {
 }
 
 export function toPersisted(state: FillLightState): PersistedFillLight {
-  return sanitizePersistedState({
-    targetColor: state.targetColor,
-    colorSource: state.colorSource,
-    presetId: state.presetId,
-    colorIntensity: state.colorIntensity,
-    screenBrightness: state.screenBrightness,
-    activeTab: state.activeTab,
-  });
+  const sanitized = sanitizePersistedState(state);
+  return (({ targetColor, colorIntensity, screenBrightness, activeTab }) => ({
+    targetColor, colorIntensity, screenBrightness, activeTab,
+  }))(sanitized);
 }
 
 export { PERSISTENCE_KEY };

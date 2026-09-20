@@ -6,6 +6,8 @@ type Props = {
   color: string;
   onChange: (hex: string) => void;
   onEnd?: (hex: string) => void;
+  onInteractionStart?: () => void;
+  onInteractionEnd?: () => void;
 };
 
 // T038–T041: Expo Go 兼容「整块 HSV 色盘」（不新增原生依赖）。
@@ -13,7 +15,7 @@ type Props = {
 // H 绕圆心 0–360°、S 由圆心 0 → 边缘 1（圆心自然为白）、V 固定 1、圆外透明。
 // 运行时只做「Image 贴图 + PanResponder 命中映射」，不拼色环 View 段、不引第三方色轮。
 const WHEEL_IMAGE = require('../../assets/color-wheel.png');
-const MIN_SIZE = 180; // PLAN §8 小屏下限
+const MIN_SIZE = 160; // 横屏矮视口下限
 const MAX_SIZE = 200; // PLAN §8 目标直径 200dp（小屏仍按 clamp 降到 180dp）
 const INDICATOR_SIZE = 20; // PLAN §8 indicator 18–22dp
 const WHEEL_VALUE = 1; // 贴图与交互同一口径：V=1
@@ -65,9 +67,10 @@ function pointToHs(x: number, y: number, radius: number, clampToRim: boolean): {
   return { h: deg, s: Math.min(1, dist / radius) };
 }
 
-export default function ColorWheelPanel({ color, onChange, onEnd }: Props) {
+export default function ColorWheelPanel({ color, onChange, onEnd, onInteractionStart, onInteractionEnd }: Props) {
   const screenW = Dimensions.get('window').width;
-  const size = Math.min(MAX_SIZE, Math.max(MIN_SIZE, screenW - 120));
+  const screenH = Dimensions.get('window').height;
+  const size = Math.min(MAX_SIZE, Math.max(MIN_SIZE, screenW > screenH ? screenH * 0.45 : screenW - 120));
   const radius = size / 2;
 
   // T041: 内部 H/S 只能从「当前 targetColor」反推初始化，绝不用默认色覆盖。
@@ -91,18 +94,18 @@ export default function ColorWheelPanel({ color, onChange, onEnd }: Props) {
     };
 
     return PanResponder.create({
+      onPanResponderGrant: (e) => { onInteractionStart?.(); selectAt(e.nativeEvent.locationX, e.nativeEvent.locationY, false); },
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderTerminationRequest: () => false,
       // 圆心死区 / 圆外透明区：本次触摸不认（不改色）
-      onPanResponderGrant: (e) => selectAt(e.nativeEvent.locationX, e.nativeEvent.locationY, false),
       // 拖出圆外时贴边继续跟手
       onPanResponderMove: (e) => selectAt(e.nativeEvent.locationX, e.nativeEvent.locationY, true),
       // 一次真实触摸结束（含落在死区的一次轻点）：只回传持久化信号，颜色不变
-      onPanResponderRelease: () => onEnd?.(color),
-      onPanResponderTerminate: () => onEnd?.(color),
+      onPanResponderRelease: () => { onInteractionEnd?.(); onEnd?.(color); },
+      onPanResponderTerminate: () => { onInteractionEnd?.(); onEnd?.(color); },
     });
-  }, [radius, color, onChange, onEnd]);
+  }, [radius, color, onChange, onEnd, onInteractionEnd, onInteractionStart]);
 
   const hueRad = (hue * Math.PI) / 180;
   const dotDistance = Math.min(1, Math.max(0, sat)) * radius;

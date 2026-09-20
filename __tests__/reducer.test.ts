@@ -24,4 +24,5 @@ describe('fillLightReducer', () => {
     expect(s.isSheetOpen).toBe(false);
     expect(s.isHydrated).toBe(true);
   });
+
 });

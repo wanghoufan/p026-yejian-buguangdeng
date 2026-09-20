@@ -73,6 +73,7 @@ export function useAppBrightness(brightness: number) {
         timerRef.current = null;
       }
       pendingRef.current = null;
+      void Brightness.restoreSystemBrightnessAsync().catch(() => setSupported(false));
     },
     [],
   );

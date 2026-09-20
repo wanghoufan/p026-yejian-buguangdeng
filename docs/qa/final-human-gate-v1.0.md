@@ -1,3 +1,5 @@
+> **归属与时效（neat-freak 追加，正文未改）**：**V1.0（历史快照，非当前有效证据）**。本文件为 V1.0 的 T064 Final Human Gate（结论「可进入 T065」），早于基线 PRODUCT_PLAN_V1.1 与 Change B（移除倒计时）；其 13 项清单中已无倒计时相关项，但门禁基线（4 suites / 18 tests）与 Dev 记录均属 V1.0。当前有效证据以 V1.1 系列报告与真机验收为准，本文件仅作历史留痕，不删除。
+
 # Final Human Gate v1.0（T064 生成，2026-09-18）
 
 ## 1. Scope Audit + 一致性审查

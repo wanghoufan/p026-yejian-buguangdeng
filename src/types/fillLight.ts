@@ -1,6 +1,5 @@
 export type ColorSource = 'preset' | 'custom';
 export type ControlTab = 'preset' | 'wheel';
-
 export type FillLightState = {
   targetColor: string;
   colorSource: ColorSource;
@@ -24,4 +23,5 @@ export type FillLightAction =
   | { type: 'SET_COLOR_INTENSITY'; colorIntensity: number }
   | { type: 'SET_SCREEN_BRIGHTNESS'; screenBrightness: number }
   | { type: 'SET_ACTIVE_TAB'; activeTab: ControlTab }
-  | { type: 'SET_SHEET_OPEN'; isSheetOpen: boolean };
+  | { type: 'SET_SHEET_OPEN'; isSheetOpen: boolean }
+  | { type: 'RESET_DEFAULTS' };

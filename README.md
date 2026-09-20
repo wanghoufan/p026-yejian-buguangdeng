@@ -2,6 +2,8 @@
 
 Expo + React Native + TypeScript 单页应用：打开即全屏补光，轻点呼出 Scheme C 毛玻璃控制面板（8 预设 / HSV 色盘 / 颜色强度 / 屏幕亮度）。本地优先，无账号无云端。包名 `com.filllight.nightlamp`，桌面名「夜间补光灯」。
 
+夜间补光灯把第二台 Android 手机变成独立补光灯：主手机负责拍摄，第二台手机负责发光，无需配对、不可远程控制。
+
 基线：`docs/plan/`（Constitution→SPEC→PLAN→TASK V1.1，UI Freeze 方案 C）。状态：V1.0 真机已验（见 `docs/handoff/HANDOFF.md`）。
 
 ## 跑起来

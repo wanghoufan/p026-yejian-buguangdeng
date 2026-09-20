@@ -1,36 +1,199 @@
 # HANDOFF｜交接（暂停/恢复用，先读我）
 
-> 旧版字段（governance-state / Evidence / Human Gate / Promotion / Dispatch ID）已废弃，不填。
+> 当前唯一现役交接：夜间补光灯 V1.1 Phase2，开发**暂停（大交接）**，未提交、未推送。
 
-- Captured at（YYYY-MM-DD HH:MM）：2026-09-19 00:45
-- PROJECT_PHASE：DEVELOP
-- PLAN_VERSION：（无，Phase2 直接按 docs/plan UI Freeze V1.1 连续开发，未走 Phase1）
-- PLAN_READINESS_SCORE：（空）
-- PLAN_GATE：APPROVED（用户口头放行 T001→T065 连续开发，T065 人验收完结）
-- DEV_BASELINE：docs/plan UI Freeze V1.1（Constitution/SPEC/PLAN/TASK + 方案C设计板）
-- CHANGE_REQUEST：NONE
-- Stage ID（本阶段叫什么）：夜间补光灯 V1.0（Expo Android）
-- 剩 P0（没完的才列，多一条都不行）：0。V1.0 COMPLETE，用户亲口“搞定”。
-- 当前 Task（正干到哪）（累计打回 n/2，supervisor每次打回时TM同步更新）：T065 收工；累计 supervisor 打回 0。
-- 执行链/Session（可选，仅真 resume 通道填，普通 subagent 可空；TM 只记录/引用，ID 由基础设施返回，不手造、不要求用户复制；返工确认是否原链；senior 升级开新链后更新）：本窗口 subagent（前期）+ codebuddy 直调 builder（后期，`codebuddy --model deepseek-v4.1-flash`）；codex/opencode 通道未实际使用。senior 未触发。
-- 未闭环评审意见（code-reviewer/qa 留的还没改的）：无。code-reviewer/qa 按 AGENTS 跳步记：单轮连续开发，review+test 由 builder 自检与 TM 真机复验承担，HANDOFF 记一句原因。
-- docs 落盘清单（本轮新增/改了哪几个 docs 文件）：README.md（模板包说明→项目实况重写）；经验一句话.md（+2026-09-19 一条）；docs/qa/android-emulator-v1.0.md、visual-freeze-v1.1.md、final-human-gate-v1.0.md（开发期填充）；本 HANDOFF.md（新建）。
-- 下一步（Next Single Action）：无代码待办。有新需求时走 `变更请求：……`（A/B 留 DEVELOP，C 进 PLAN_REOPEN_REQUIRED）。
-- 人要拍什么板（列出来问，不问不许开工）：无。
-- permission_request（可选：原文/决策/回执一句，首版可先记自然语言一句）：无。
-- 收尾记一笔（neat-freak：文档对齐了没、临时文件清了没、未决列完没；neat 派完后 TM 补记，若已落盘则追加修订行）：neat-freak 轻量路径已执行：README 对齐代码实况；/tmp 下录屏截图为本机临时证据，不进仓库；`USER_MODEL_OVERRIDE.md` 为实文件（断链拷贝，非软链，动因见下）；未决：git 尚无远端，push 待用户给远端地址。
+- Captured at（YYYY-MM-DD HH:MM）：2026-09-20 12:30
+- PROJECT_PHASE：`DEVELOP`（T-V1.1-03-R1 已闭环；P0=0）
+- PLAN_VERSION：`PRODUCT_PLAN_V1.1`
+- PLAN_READINESS_SCORE：（Phase1 已结束，不适用）
+- PLAN_GATE：`APPROVED`
+- DEV_BASELINE：`PRODUCT_PLAN_V1.1`
+- CHANGE_REQUEST：`B`（移除倒计时，回到无倒计时行为）；本轮另有 2 处 `A` 类开发内小改（见 §1.3）＋ A4 预设对齐 Plan（用户明确拍板“改成 Plan 那套”，色值源 UI Freeze-SPEC US3 表）
+- Stage ID（本阶段叫什么）：夜间补光灯 V1.1 Phase2 开发
+- 剩 P0（没完的才列，多一条都不行）：**无，0 条**（横屏预设页滚动已修好并真机闭环，见 §1.2 新行与 §4 关闭说明）。
+- 当前 Task（正干到哪）：`T-V1.1-03-R1`**已闭环**（builder→reviewer→qa→supervisor PASS；supervisor 累计打回 2 次，均为账本/文档格式项，代码零返工；未触发 senior 升级——无代码硬骨头，记账说明见 §5 末）。
+- 执行链/Session：codebuddy 通道恢复可用（用户拍板后实测直调成功，serve 63928）；override 表 builder 行已更新。
+- 未闭环评审意见：无（reviewer P1-1 误判已更正转 PASS；supervisor 三轮终判 PASS）。
+- docs 落盘清单（本轮新增/改了哪几个 docs 文件）：
+  - 本文件 `docs/handoff/HANDOFF.md`（更新关闭）
+  - `__tests__/sheet-scroll.test.tsx`（新）、`src/components/ControlSheet.tsx`、`src/constants/presets.ts`
+  - `docs/review/CODE_REVIEW-V1.1-03R1.md`（新）、`docs/qa/V1.1-03R1-qa.md`（新）
+  - `docs/model/TASK-MODEL-LOG.jsonl`、`docs/model/DISPATCH-LOG.jsonl`、`USER_MODEL_OVERRIDE.md`
+  - neat-freak 时效标注：`docs/qa/v1.1-static-qa.md`、`docs/qa/visual-freeze-v1.1.md`、`docs/qa/android-emulator-v1.0.md`、`docs/qa/final-human-gate-v1.0.md`、`docs/store-copy.md`
+- 下一步（Next Single Action）：**无 P0，收工**（要发版/提测由用户下指令；仍不 commit 不 push）。
+- T-V1.1-04（Change A 滑条专项，待用户复验）：症状=拇指 100% 右半被裁＋往右再往左拖脱离滑不动；修法已在树内（`LabeledSlider.tsx`：rail 内缩一半径＋blockNativeResponder/cancelable={false}＋onTouchCancel 不判死＋onLayout 预热 measure），Metro 新 bundle 已自证含修法，门禁 lint0/tsc0/jest9/43；App 已冷启，用户复验中。codebuddy 长任务两轮 10 分钟零输出卡死（探针秒回），长任务改走短拆或本窗口直做。
+- 人要拍什么板（列出来问，不问不许开工）：
+  1. ~~builder / qa 通道~~ 已决：全走 codebuddy（主 deepseek-v4.1-flash、备 glm-5.3-flash），override 表已更新。
+  2. ~~A4 预设组~~ 已决：改成 Plan 那套并落盘（8 色 id/名/HEX 照 SPEC US3 表）。
+- permission_request：无
+- permission_request：无
+- 收尾记一笔（neat-freak）：**已派并完成**。文档对齐：5 个文件加时效/归属标注（正文未改）；残留清理：根、`docs/`、`docs/plan/` 下 `.DS_Store` 已删；未决项已列全（见上"人要拍什么板"）。仍剩 `android/.DS_Store`、`android/app/.DS_Store`、`.git/.DS_Store`（授权范围外，未动，可安全删除）。
 
 ## 恢复读盘（全体系唯一顺序，别乱）
 
 1. AGENTS；2. 角色卡；3. 根 `USER_MODEL_OVERRIDE.md`；4. 本 HANDOFF；5. 根 `经验一句话.md`；6. 任务目标放最后。
 冲突才扩大读。
 
-## 本工程关键事实（恢复开发先看这段）
+---
 
-- 应用：Expo SDK57 + RN + TS，包名 `com.filllight.nightlamp`，桌面名「夜间补光灯」（app.json；package.json 的 name 仍是 `fill-light-tmp`，仅 npm 名，不影响 App，可改可不改）。
-- 安装包：`android/app/build/outputs/apk/release/app-release.apk`（本地编译，debug keystore 签名）。编译 env：`JAVA_HOME=$HOME/android-toolchain/jdk-17.0.20.1+1/Contents/Home`，`ANDROID_HOME=$HOME/android-toolchain/sdk`；改 app.json 后先 `npx expo prebuild --platform android`（必须在项目根跑，在 android/ 下跑会报错）。
-- 装过的手机：Note 11T Pro=22041216UC（USB，`IN9LZTAYV4UGU4JF`，主力验证机）；Note 12T Pro=23054RA19C pearl（USB 来过一次又断开）；22101316C=Note 12 Pro（别碰，另一个项目在用；无线 `192.168.31.31` 即它，曾误装一次）。小米机首次 USB 安装/无线调试需手机侧一次确认。
-- 修过的 P0（都在包里了）：①切 Tab 重置颜色（挂载回写）→ 只 SET_ACTIVE_TAB；②色轮碎裂 → PNG 贴图 HSV 色盘（`scripts/generate-color-wheel.js` 生成 `assets/color-wheel.png`）+ indicator；③亮度条闪跳 → locationX 相对子 View 塌值，改 measure 缓存 + pageX 换算，另加 dispatch 32ms 节流 + 原生 80ms 节流（`src/utils/throttle.ts`）。
-- 门禁现状：`npm run lint` 0 warn，`npx tsc --noEmit` PASS，`npm test` 7 suites / 35 tests PASS。
-- 分工表现状：builder=`codebuddy/deepseek-v4.1-flash`（限额切 glm-5.3-flash），qa 普通走 codex Luna、真机走本窗口 bash；表为实文件（用户 09-19 口令要求按模板分发版*)同步，母版在 `4.Templates（PC）/2026-09-09…分发版-2026-09-11/USER_MODEL_OVERRIDE.md`，禁改别处。
-- 未做：git 无仓库（neat 时建）；远端无，push 待定；`docs/model/*LOG.jsonl` 仍是模板示例行（开发期走本窗口+codebuddy 未记账，下次 Phase2 派工前按 AGENTS 补记或删示例行）。
+## 1. 当前工作进展
+
+### 1.1 环境三项阻塞：本次实测**已全部解除**（旧 HANDOFF 结论已过期）
+
+| 项 | 旧结论 | 2026-09-20 实测 |
+|---|---|---|
+| Clash Verge 7897 | 无监听 | `nc -z 127.0.0.1 7897` → OPEN；`curl -x http://127.0.0.1:7897 https://services.gradle.org` → **200**（旧 `lsof` 看不到只是因为它跑在 root 下，不是没起） |
+| `~/.gradle` 可写 | 不可写 | `test -w "$HOME/.gradle"` → **WRITABLE**；`gradle-9.3.1-bin` 已在 wrapper 缓存 |
+| ADB | daemon 起不来 | daemon 正常；`adb devices -l` 两台在列；`adb reverse` 可用 |
+
+### 1.2 真机复验矩阵（设备 `IN9LZTAYV4UGU4JF`，小米 22041216UC / 1080×2460 / 440dpi，横屏 2460×1080）
+
+| 项 | 结果 | 证据 |
+|---|---|---|
+| 面板打开/收起 | PASS | 点画布开、再点关；两态截图 hash 稳定复现 |
+| 色轮 | PASS | 切 tab 出色盘；盘上选色 → 画布由 `#FFF2E2` 变蓝 |
+| 颜色强度滑条 | PASS | 拖至中点，UI `100%` → `50%` |
+| 屏幕亮度滑条 | PASS | 拖至中点，UI `100%` → `50%` |
+| 横竖屏旋转 | PASS（不闪退） | 2460×1080 正常出图，进程未重启 |
+| 自动收起 | PASS | 竖屏、横屏各静置 7s 后面板均自动收起 |
+| 恢复暖白默认 | PASS | 画布回到 `#FFF2E2`，面板回「暖白选中 / 100% / 100%」（截图与基线字节数一致） |
+| 无 `layout of null` 闪退 | PASS | 全程 `grep -c "layout of null\|FATAL EXCEPTION"` = **0**，pid 未变 |
+| 无倒计时 UI | PASS | 面板无任何倒计时/剩余/分钟字样或控件 |
+| **横屏预设页滚动（R1 关闭）** | **PASS** | 2026-09-20 新 bundle 真机：横屏 2460×1080 页内上滑前后截图 hash `5ffb3beb` → `5633fcd4`（变化=能滚），「颜色强度 / 屏幕亮度」两滑条滚出可达（/tmp/lp1.png、/tmp/lp2.png）；`layout of null/FATAL` 0；unit 自证旧代码 1 失败→修后 3/3 过 |
+
+### 1.3 本轮代码改动（**均未提交**）
+
+1. `android/app/src/debug/AndroidManifest.xml`（Change A）
+   - 新增 `<uses-permission android:name="android.permission.INTERNET"/>`（**仅 debug 变体**）。
+   - 原因：`android/app/src/main/AndroidManifest.xml:9` 的 `tools:node="remove"` 对**全部变体**生效，debug 包没有 INTERNET → `socket failed: EPERM` → 连不上 Metro → 红屏 `Unable to load script`。
+   - 验收：debug 合并清单含 `INTERNET` + `SYSTEM_ALERT_WINDOW`；**release 合并清单仍不含 INTERNET**（DoD 零权限口径未被破坏）。
+2. `src/components/ControlSheet.tsx`（Change A）
+   - 删除 `isWheelTab` 条件分支，预设页与色轮页**共用同一个 ScrollView**；`measure` 按 `state.activeTab` 打标。
+   - 效果：横屏预设页内容**已被正确裁剪**，footer 重叠消除。
+   - **遗留**：`scrollEnabled` 判不成立 → 页面不能滚动（§4）。
+
+### 1.4 门禁（2026-09-20 实跑）
+
+- `npm run lint` → 0 error / 0 warning
+- `npx tsc --noEmit` → exit 0
+- `npm test -- --runInBand` → **8 suites / 40 tests 全过**
+
+### 1.5 构建与产物
+
+- 命令：`cd android && ./gradlew :app:assembleDebug --no-daemon --no-watch-fs --stacktrace`
+- 结果：**BUILD SUCCESSFUL in 7m9s**，exit 0
+- 产物：`android/app/build/outputs/apk/debug/app-debug.apk`，**222,195,246 B**，mtime `2026-09-20 09:41`，sha256 `810b14aff7bf0cfec0c99a52…`
+- 安装：`adb -s IN9LZTAYV4UGU4JF install -r …` → Success
+- 复现验证用：`./gradlew :app:processReleaseMainManifest :app:assembleDebug --no-daemon --no-watch-fs`
+
+### 1.6 工作区
+
+- 大量未提交改动（V1.1 存量 + 上述 2 处 + 治理/账本/文档），**未 commit、未 push**。
+- 未跟踪新文件：`__tests__/v11.test.tsx`、`docs/pm/PRODUCT_PLAN_V1.1.md`、`docs/qa/v1.1-static-qa.md`、`docs/review/CODE_REVIEW-V1.1-01.md`、`docs/store-copy.md`。
+- **不要**用 `git reset --hard` / `git checkout --` / 批量清理恢复工作区。
+
+---
+
+## 2. 下一步任务
+
+### Next Single Action（就干这一件）
+
+修 `T-V1.1-03` 遗留：**让横屏「预设颜色」页能滚动**，使「颜色强度 / 屏幕亮度」在横屏可达。改 `src/components/ControlSheet.tsx` 一处即可。
+
+返工要点（编排者已定位的根因假设，返工指令原件见 `/tmp/task_builder_v11_03r1.md`）：
+- 两个 Tab 共用同一个 ScrollView 后，它的**视口高度与 tab 无关**，不应再按 tab 打标、更不该用旧值互相清零：
+  - `onLayout` 里写的是 `contentH: m.tab === state.activeTab ? m.contentH : 0`；
+  - `onContentSizeChange` 里写的是 `viewportH: m.tab === state.activeTab ? m.viewportH : 0`；
+  - 两者在挂载回调顺序/tab 变化时会互相把对方清成 0 → `scrollEnabled` 恒 false（内容仍被裁剪，因为 ScrollView 天生裁剪，所以只看到"重叠没了但滚不动"）。
+- 改成两个**互不覆盖**的状态值：`onLayout` 只写 `viewportH`，`onContentSizeChange` 只写 `contentH`，派生 `scrollEnabled = contentH > viewportH + 1`（保留既有 `Number.isFinite` 防护，那是既有 P0）。
+- **必须自证**：在 `__tests__/` 加一个测试，渲染 `ControlSheet`（沿用 `__tests__/v11.test.tsx` 的 mock 写法），用 `act` 驱动 `testID='sheet-scroll'` 节点的 `onLayout`（小视口）与 `onContentSizeChange`（大内容），断言 `scrollEnabled===true`；再断言内容小于视口时为 `false`。**要求先用旧代码跑一遍证明它会失败**。
+- 不得退化：竖屏未溢出时仍不位移/不回弹/滑条可正常拖动；5 秒自动收起、恢复默认、预设数据、reducer/持久化/亮度一律不动。
+
+### 后续步骤（修完后按序）
+
+1. **重启 Metro（务必去掉 `CI=1`）**，再冷启应用：
+   ```bash
+   cd "/Users/zzymima0000/Developer/coding/1.Active/026-ing-夜间补光灯"
+   npx expo start --port 8081          # 不要加 CI=1
+   adb -s IN9LZTAYV4UGU4JF reverse tcp:8081 tcp:8081
+   adb -s IN9LZTAYV4UGU4JF shell am force-stop com.filllight.nightlamp
+   adb -s IN9LZTAYV4UGU4JF shell am start -n com.filllight.nightlamp/.MainActivity
+   ```
+2. **真机复验横屏**（本窗口 bash 直驱；每步复断言横屏，见 §3.4）：
+   ```bash
+   adb -s IN9LZTAYV4UGU4JF shell cmd window user-rotation lock 1
+   # 打开面板 → 切「预设颜色」→ 页内上滑 → 截图 hash 必须变化；两个滑条能滚出来
+   ```
+3. **重跑三门禁**：`npm run lint` / `npx tsc --noEmit` / `npm test -- --runInBand`。
+4. **派 code-reviewer（本窗口 subagent）复核 `ControlSheet.tsx`**，写 `docs/review/`（照 `CODE_REVIEW.template.md`）。
+5. **派 qa** 出正式 QA（`docs/qa/`，照 `BUGS.template.md`）；真机部分走本窗口直驱并在 note 记分支。
+6. **派 supervisor** 复检。
+7. **收尾**：更新本 HANDOFF；往 `docs/model/TASK-MODEL-LOG.jsonl` 与 `docs/model/DISPATCH-LOG.jsonl` 补记本轮；根 `经验一句话.md` 追加一句。
+
+---
+
+## 3. 注意事项及相关规矩
+
+### 3.1 用户明确下的严格限制（恢复后同样有效）
+
+- 不执行 `expo prebuild --clean`；不删除 `android/`、Gradle 缓存或 APK。
+- 不修改 `~/.zshrc`；不擅自杀掉其他 `adb` 或代理进程。
+- **不触碰设备 `22101316C`**；真机命令一律 `adb -s <序列号>`；主力 `IN9LZTAYV4UGU4JF`，第二台 `UKCESWB67PUO7LPB`。
+- **不重新添加倒计时**（状态 / action / Hook / 工具函数 / UI 全不许）。
+- 不修改 Plan、治理文件、旧版封存或无关项目。
+- **不 commit、不 push**，除非用户明确给出指令。
+- 若需 `expo prebuild --platform android`：必须先确认确有原生配置变更需要；执行后复查 Manifest——**不能回填非法 `screenOrientation="all"`**，四条 `tools:node="remove"` 规则必须保留。
+
+### 3.2 必须保留的功能
+
+自动收起、恢复默认、预设颜色、色轮、颜色强度、屏幕亮度及已有持久化行为。
+
+### 3.3 ⚠️ Metro 必须去掉 `CI=1`（本轮最大坑，务必记住）
+
+- 编排者曾用 `CI=1 npx expo start`，Metro 自报：`Metro is running in CI mode, reloads are disabled. Remove CI=true to enable watch mode.`
+- 后果：Metro **关掉文件监听**，一直供启动时的旧 bundle，应用跑的是**改动前的代码** —— 会得出"改了没用"的错误结论（本轮真实踩过，浪费了一整轮复验）。
+- 正确做法：`npx expo start --port 8081`（不加 `CI=1`）；改完代码后**冷启应用**（`am force-stop` + `am start`）。
+- 自证方法：`curl -s "http://127.0.0.1:8081/index.bundle?platform=android&dev=true&minify=false" | grep -c "标志字符串"`。
+- 另：debug 包**必须**有 Metro 才能跑（`adb reverse tcp:8081 tcp:8081` + Metro 在跑）；release 包自带 JS，不需要 Metro。
+
+### 3.4 设备侧干扰与旋转（每次真机测试都会遇到）
+
+- MIUI 会弹 `com.miui.securitycenter/com.miui.permcenter.install.AdbInstallActivity`（USB 安装确认），并周期性把**别的 App**（如 `com.proteincalculator.app` 的 keep-alive）拉到前台 → 自动化点击会被打断。对策：每步操作前 `am start` 把应用拉回前台，操作+截图紧接执行。
+- 别的 App 会 `request=SCREEN_ORIENTATION_PORTRAIT`，把 `settings put system user_rotation 1` 顶回 0。横屏测试用 **`adb shell cmd window user-rotation lock 1`**，并在截图前复断言横屏（`file xxx.png` 应为 `2460 x 1080`）。
+- 测试完记得还原：`cmd window user-rotation lock 0` 或 `settings put system accelerometer_rotation 1`。
+
+### 3.5 小米 USB 安装
+
+需要手机侧确认；电脑命令无法替代该确认。
+
+### 3.6 其它（非阻塞，未修）
+
+- `app.json` 缺 `scheme` → expo-router 报 Linking 警告（P3）。
+- `ExpoKeepAwake.deactivate` 在 Activity 销毁时产生一次未捕获 promise rejection（P3）。
+- `docs/qa/v1.1-static-qa.md` 是 Change B **之前**的快照，已加时效标注，勿据其判断当前状态。
+
+---
+
+## 4. 已知未修缺陷（唯一 P0）：横屏「预设颜色」页不可滚动
+
+- **症状**：横屏（2460×1080）打开控制面板、停在「预设颜色」页时，页面**完全不能滚动**（实测页内 `(200,900)→(200,500)` 上滑前后截图 SHA256 **完全相同**：`9312c545d0` = `9312c545d0`）。内容被裁在可视区外，「颜色强度 / 屏幕亮度」两个滑条**用户永远够不到**。
+- **对照**：同一面板横屏切到「色轮」页**可以**滚动、两个滑条能滚出来 → 滚动机制本身在这台设备上可用。
+- **实测像素带**（横屏）：tabs y=500..505；预设第 1 行标签 y=730..764；预设第 2 行圆点裁在 y≈925 之下；footer 文本 y=977..1015；页面内看不到也够不到滑条。
+- **几何背景**：`clampSheetHeight` = `min(420, max(260, screenH*0.46))`，横屏 `Dimensions` 高约 392.7dp → sheet 被 `min` 夹到 **260dp ≈ 715px**，而预设页内容约 750px+，**必须靠滚动**才能用。
+- **根因假设**：见 §2 Next Single Action 的三条。
+- **已修好的部分（别回退）**：横屏预设页内容已被 ScrollView 正确裁剪、footer 与预设不再重叠。
+- **R1 关闭（2026-09-20）**：`measure` 去 tab 打标、`onLayout` 只写 `viewportH`、`onContentSizeChange` 只写 `contentH`、`scrollEnabled = isFinite 双检 + contentH > viewportH + 1`；真机横屏上滑 hash 变化、两滑条可达；本 P0 关闭，复发先跑 `__tests__/sheet-scroll.test.tsx`。
+
+---
+
+## 5. 通道现状（恢复开发前必须先解决）
+
+| 通道 | 状态 | 说明 |
+|---|---|---|
+| `codex` | **不可用** | 全局限额，报 `You've hit your usage limit`，**2026-09-20 13:43 后恢复**。planner / qa / product-reviewer / senior-expert 四行都在此通道。 |
+| `codebuddy` | **不可用（本机必挂）** | 嵌套 codebuddy 固定要绑 `127.0.0.1:63929`，被本机正在运行的父 codebuddy 会话占用 → `listen EADDRINUSE` → unhandled rejection → 进程卡死（CPU 0%、零输出）。已试 9 种绕法全挂：stdin 重定向、清 `CODEBUDDY_*` 父会话环境变量、换 cwd、`CODEBUDDY_DISABLE_PROXY_CONFIG_FILE=1`、`CODEBUDDY_IDE_PORT=61999`、`CODEBUDDY_DISABLE_IDE=1`、去掉 `--tools`、以及用户截图的 `--effort high -y -p` 调用形。端口由内部 `endpointProvider.get()` 决定，不受环境变量/配置文件控制。 |
+| `opencode` | **可用（已真调）** | 逐个返回"可用"：`opencode-go/gpt-5.6-luna`、`opencode-go/deepseek-v4.1-flash`、`opencode-go/glm-5.3-flash`、`opencode-go/muse-spark-1.3-contributor`（现 supervisor 行）、`opencode/muse-spark-1.3-contributor-free`（现 code-reviewer / experience-recorder / neat-freak 行）。调用形：`opencode run -m <全ID> "任务"`。 |
+
+- 分工表真源：`USER_MODEL_OVERRIDE.md` 的 builder 行已按用户 2026-09-20 拍板更新为 codebuddy（主 deepseek-v4.1-flash、备 glm-5.3-flash），同日实测直调成功。
+- 恢复开发的第一步就是让用户拍板 builder / qa 用哪条通道。
+- 升级计数说明：supervisor 对 T-V1.1-03-R1 累计打回 2 次，但两次均为账本/文档格式项（缺 R1 行、runtime 枚举、model 精确 ID、rework 少报、review 残留句），代码本身零返工、P0 一次修好，故 TM 判定不触发 senior 升级；如用户不同意可推翻。
