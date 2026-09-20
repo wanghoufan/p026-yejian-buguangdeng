@@ -22,6 +22,8 @@
   - neat-freak 时效标注：`docs/qa/v1.1-static-qa.md`、`docs/qa/visual-freeze-v1.1.md`、`docs/qa/android-emulator-v1.0.md`、`docs/qa/final-human-gate-v1.0.md`、`docs/store-copy.md`
 - 下一步（Next Single Action）：**无 P0，收工**（要发版/提测由用户下指令；仍不 commit 不 push）。
 - T-V1.1-04（Change A 滑条专项，待用户复验）：症状=拇指 100% 右半被裁＋往右再往左拖脱离滑不动；修法已在树内（`LabeledSlider.tsx`：rail 内缩一半径＋blockNativeResponder/cancelable={false}＋onTouchCancel 不判死＋onLayout 预热 measure），Metro 新 bundle 已自证含修法，门禁 lint0/tsc0/jest9/43；App 已冷启，用户复验中。codebuddy 长任务两轮 10 分钟零输出卡死（探针秒回），长任务改走短拆或本窗口直做。
+- 双机推送后打不开事件（2026-09-20）：两台手机 `adb reverse tcp:8081` 映射丢失（主力机只剩 8083），debug 包够不着 Metro → 红屏 Unable to load script；补映射＋冷启后两台均恢复。教训：每次推包/复验前先 `adb -s <号> reverse --list` 确认 8081 在列。
+- 最终包（2026-09-20）：`assembleRelease` 成功（`app-release.apk` 96MB），release 合并清单三处 INTERNET=0（DoD 零权限保住），两台手机均装 release 版并冷启验证为补光画布（无 debugger 条=release 自带 JS，不依赖 Metro，断网可用）。公开仓库已建并推送：https://github.com/wanghoufan/yejian-buguangdeng（main；仓库名用拼音，避开美国 Fill Light 商标）。
 - 人要拍什么板（列出来问，不问不许开工）：
   1. ~~builder / qa 通道~~ 已决：全走 codebuddy（主 deepseek-v4.1-flash、备 glm-5.3-flash），override 表已更新。
   2. ~~A4 预设组~~ 已决：改成 Plan 那套并落盘（8 色 id/名/HEX 照 SPEC US3 表）。
