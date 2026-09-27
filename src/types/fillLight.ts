@@ -11,9 +11,9 @@ export type FillLightState = {
   isHydrated: boolean;
 };
 
+// 预设只保留稳定 id 与颜色；显示名按 id 到 i18n 词典查（presets.<id>）。
 export type FillLightPreset = {
   id: string;
-  label: string;
   color: string;
 };
 

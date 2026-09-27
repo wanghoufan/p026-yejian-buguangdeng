@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Dimensions, Image, PanResponder, StyleSheet, View } from 'react-native';
+import { useLanguage } from '../hooks/useLanguage';
 import { hexToRgb, rgbToHex } from '../utils/color';
 
 type Props = {
@@ -68,6 +69,7 @@ function pointToHs(x: number, y: number, radius: number, clampToRim: boolean): {
 }
 
 export default function ColorWheelPanel({ color, onChange, onEnd, onInteractionStart, onInteractionEnd }: Props) {
+  const { t } = useLanguage();
   const screenW = Dimensions.get('window').width;
   const screenH = Dimensions.get('window').height;
   const size = Math.min(MAX_SIZE, Math.max(MIN_SIZE, screenW > screenH ? screenH * 0.45 : screenW - 120));
@@ -120,7 +122,7 @@ export default function ColorWheelPanel({ color, onChange, onEnd, onInteractionS
         {...pan.panHandlers}
         testID="wheel-ring"
         accessibilityRole="adjustable"
-        accessibilityLabel="色相色盘"
+        accessibilityLabel={t('accessibility.colorWheel')}
         accessibilityValue={{ now: Math.round(hue), min: 0, max: 360 }}
         style={[styles.wheel, { width: size, height: size, borderRadius: radius }]}
       >

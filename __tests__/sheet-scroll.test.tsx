@@ -14,6 +14,24 @@ jest.mock('../src/state/FillLightContext', () => ({
   useFillLight: () => ({ state: mockState, dispatch: mockDispatch, persistNow: mockPersistNow, display: '#FFFFFF' }),
 }));
 
+jest.mock('expo-router', () => ({
+  useRouter: () => ({ push: jest.fn(), back: jest.fn(), replace: jest.fn(), canGoBack: () => false }),
+}));
+
+jest.mock('../src/hooks/useLanguage', () => {
+  const { translate } = jest.requireActual('../src/i18n');
+  return {
+    useLanguage: () => ({
+      locale: 'zh-CN',
+      setLocale: jest.fn(),
+      t: (key: string) => translate('zh-CN', key),
+      isReady: true,
+      saveError: false,
+      retrySave: jest.fn(),
+    }),
+  };
+});
+
 type Tree = ReturnType<typeof create>;
 
 function scrollOf(tree: Tree) {

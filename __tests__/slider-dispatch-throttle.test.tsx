@@ -26,6 +26,24 @@ jest.mock('../src/state/FillLightContext', () => ({
   }),
 }));
 
+jest.mock('expo-router', () => ({
+  useRouter: () => ({ push: jest.fn(), back: jest.fn(), replace: jest.fn(), canGoBack: () => false }),
+}));
+
+jest.mock('../src/hooks/useLanguage', () => {
+  const { translate } = jest.requireActual('../src/i18n');
+  return {
+    useLanguage: () => ({
+      locale: 'zh-CN',
+      setLocale: jest.fn(),
+      t: (key: string) => translate('zh-CN', key),
+      isReady: true,
+      saveError: false,
+      retrySave: jest.fn(),
+    }),
+  };
+});
+
 const touch = (locationX: number) => ({ nativeEvent: { locationX } } as any);
 const layout = (width: number) => ({ nativeEvent: { layout: { width } } } as any);
 // RN 0.86 下 Pressable 的类型身份与测试树不一致，按「带触摸处理的节点」定位（最外层即组件元素）。

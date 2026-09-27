@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Animated, Dimensions, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { clampSheetHeight, motion, radius, ui } from '../theme/tokens';
 import DragHandle from './DragHandle';
 import SegmentedTabs from './SegmentedTabs';
@@ -8,6 +9,7 @@ import ColorWheelPanel from './ColorWheelPanel';
 import LabeledSlider from './LabeledSlider';
 import { PRESETS } from '../constants/presets';
 import { useFillLight } from '../state/FillLightContext';
+import { useLanguage } from '../hooks/useLanguage';
 import { createTrailingThrottle } from '../utils/throttle';
 
 const CLOSE_DP = 72;
@@ -18,6 +20,8 @@ export const DISPATCH_THROTTLE_MS = 32;
 // T027-T032, T037, T040, T042, T046: Scheme C Control Sheet。
 export default function ControlSheet() {
   const { state, dispatch, persistNow } = useFillLight();
+  const { t } = useLanguage();
+  const router = useRouter();
   const open = state.isSheetOpen;
   const height = clampSheetHeight(Dimensions.get('window').height);
   const [translate] = useState(() => new Animated.Value(height));
@@ -48,6 +52,12 @@ export default function ControlSheet() {
   }, [open, height, translate]);
 
   const close = () => dispatch({ type: 'SET_SHEET_OPEN', isSheetOpen: false });
+
+  // 设置入口：先关闭 Sheet（关闭即卸载 → 自动收起计时器随 effect cleanup 一并清除），再进设置页。
+  const openSettings = useCallback(() => {
+    dispatch({ type: 'SET_SHEET_OPEN', isSheetOpen: false });
+    router.push('/settings');
+  }, [dispatch, router]);
 
   // P0 拖动断续：拖动中每帧 dispatch → Context 全量重渲染 → Slider 子树重建。
   // 32ms trailing 节流压频率；touchEnd 走 flush 同步补发最终值（不吞、不跳回）。
@@ -114,7 +124,7 @@ export default function ControlSheet() {
     <>
       <LabeledSlider
         testID="intensity-slider"
-        label="颜色强度"
+        label={t('controls.colorIntensity')}
         value={state.colorIntensity}
         onValueChange={onIntensityChange}
         onSlidingComplete={onIntensityComplete}
@@ -124,7 +134,7 @@ export default function ControlSheet() {
       <View style={styles.gap} />
       <LabeledSlider
         testID="brightness-slider"
-        label="屏幕亮度"
+        label={t('controls.screenBrightness')}
         value={state.screenBrightness}
         onValueChange={onBrightnessChange}
         onSlidingComplete={onBrightnessComplete}
@@ -174,8 +184,8 @@ export default function ControlSheet() {
       <View style={styles.body}>
         <SegmentedTabs
           tabs={[
-            { id: 'preset', label: '预设颜色' },
-            { id: 'wheel', label: '色轮' },
+            { id: 'preset', label: t('tabs.presets') },
+            { id: 'wheel', label: t('tabs.colorWheel') },
           ]}
           value={state.activeTab}
           // T041: 切 Tab 只 dispatch SET_ACTIVE_TAB，绝不改动当前颜色/强度。
@@ -205,7 +215,21 @@ export default function ControlSheet() {
           {sliders}
         </ScrollView>
         <View style={styles.footer}>
-          <Pressable testID="reset-defaults" onPress={() => { dispatch({ type: 'RESET_DEFAULTS' }); persistNow(); endInteraction(); }} style={styles.reset}><Text style={styles.resetText}>恢复暖白默认</Text></Pressable>
+          <Pressable
+            testID="open-settings"
+            accessibilityRole="button"
+            onPress={openSettings}
+            style={styles.footerButton}
+          >
+            <Text style={styles.settingsText}>{t('settings.entry')}</Text>
+          </Pressable>
+          <Pressable
+            testID="reset-defaults"
+            onPress={() => { dispatch({ type: 'RESET_DEFAULTS' }); persistNow(); endInteraction(); }}
+            style={styles.footerButton}
+          >
+            <Text style={styles.resetText}>{t('controls.resetWarmWhite')}</Text>
+          </Pressable>
         </View>
       </View>
     </Animated.View>
@@ -228,7 +252,13 @@ const styles = StyleSheet.create({
   fill: { flex: 1 },
   panel: { paddingTop: 12, minHeight: 170 },
   gap: { height: 12 },
-  footer: { paddingTop: 8 },
-  reset: { alignSelf: 'flex-end', paddingVertical: 7, paddingHorizontal: 10 },
+  footer: {
+    paddingTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  footerButton: { paddingVertical: 7, paddingHorizontal: 10 },
   resetText: { color: ui.accent, fontSize: 13, fontWeight: '600' },
+  settingsText: { color: ui.textSecondary, fontSize: 13, fontWeight: '600' },
 });

@@ -1,7 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useKeepAwake } from 'expo-keep-awake';
-import { FillLightProvider, useFillLight } from '../src/state/FillLightContext';
+import { useFillLight } from '../src/state/FillLightContext';
+import { useLanguage } from '../src/hooks/useLanguage';
 import { useSystemUi } from '../src/hooks/useSystemUi';
 import { useAppBrightness } from '../src/hooks/useAppBrightness';
 import LightCanvas from '../src/components/LightCanvas';
@@ -11,6 +12,7 @@ import ControlSheet from '../src/components/ControlSheet';
 function Screen() {
   useKeepAwake(); // T023
   const { state, display, dispatch } = useFillLight();
+  const { isReady } = useLanguage();
   useSystemUi(true); // T025
   useAppBrightness(state.screenBrightness); // T045-T049
 
@@ -21,17 +23,14 @@ function Screen() {
     <View style={styles.root}>
       <StatusBar hidden />{/* T024 */}
       <LightCanvas displayColor={display} onTap={toggle} />
-      {state.isSheetOpen && <ControlSheet />}
+      {/* 画布立即渲染；含翻译文案的控件等语言初始化完成再挂载，避免语言闪屏。 */}
+      {state.isSheetOpen && isReady && <ControlSheet />}
     </View>
   );
 }
 
 export default function Index() {
-  return (
-    <FillLightProvider>
-      <Screen />
-    </FillLightProvider>
-  );
+  return <Screen />;
 }
 
 const styles = StyleSheet.create({

@@ -1,17 +1,19 @@
 # HANDOFF｜交接（暂停/恢复用，先读我）
 
+> ⚠️ 下面 1–32 行的状态块是 **2026-09-20 的 V1.1 快照，已过期**；V2.1（多语言）的现状见文末「2026-09-27 增补」。
+
 > 当前唯一现役交接：夜间补光灯 V1.1 Phase2，开发**暂停（大交接）**，未提交、未推送。
 
 - Captured at（YYYY-MM-DD HH:MM）：2026-09-20 12:30
-- PROJECT_PHASE：`DEVELOP`（T-V1.1-03-R1 已闭环；P0=0）
-- PLAN_VERSION：`PRODUCT_PLAN_V1.1`
+- PROJECT_PHASE：`DEVELOP`（Human Gate 批准，Phase2 启动）
+- PLAN_VERSION：`PRODUCT_PLAN_V2.1`
 - PLAN_READINESS_SCORE：（Phase1 已结束，不适用）
 - PLAN_GATE：`APPROVED`
-- DEV_BASELINE：`PRODUCT_PLAN_V1.1`
-- CHANGE_REQUEST：`B`（移除倒计时，回到无倒计时行为）；本轮另有 2 处 `A` 类开发内小改（见 §1.3）＋ A4 预设对齐 Plan（用户明确拍板“改成 Plan 那套”，色值源 UI Freeze-SPEC US3 表）
-- Stage ID（本阶段叫什么）：夜间补光灯 V1.1 Phase2 开发
-- 剩 P0（没完的才列，多一条都不行）：**无，0 条**（横屏预设页滚动已修好并真机闭环，见 §1.2 新行与 §4 关闭说明）。
-- 当前 Task（正干到哪）：`T-V1.1-03-R1`**已闭环**（builder→reviewer→qa→supervisor PASS；supervisor 累计打回 2 次，均为账本/文档格式项，代码零返工；未触发 senior 升级——无代码硬骨头，记账说明见 §5 末）。
+- DEV_BASELINE：`PRODUCT_PLAN_V2.1`
+- CHANGE_REQUEST：`NONE`
+- Stage ID（本阶段叫什么）：夜间补光灯 V2.1 多语言支持 开发
+- 剩 P0（没完的才列，多一条都不行）：**无，0 条**
+- 当前 Task（正干到哪）：Phase2 启动——多语言功能开发（builder 写→reviewer→qa→supervisor）
 - 执行链/Session：codebuddy 通道恢复可用（用户拍板后实测直调成功，serve 63928）；override 表 builder 行已更新。
 - 未闭环评审意见：无（reviewer P1-1 误判已更正转 PASS；supervisor 三轮终判 PASS）。
 - docs 落盘清单（本轮新增/改了哪几个 docs 文件）：
@@ -199,3 +201,44 @@
 - 分工表真源：`USER_MODEL_OVERRIDE.md` 的 builder 行已按用户 2026-09-20 拍板更新为 codebuddy（主 deepseek-v4.1-flash、备 glm-5.3-flash），同日实测直调成功。
 - 恢复开发的第一步就是让用户拍板 builder / qa 用哪条通道。
 - 升级计数说明：supervisor 对 T-V1.1-03-R1 累计打回 2 次，但两次均为账本/文档格式项（缺 R1 行、runtime 枚举、model 精确 ID、rework 少报、review 残留句），代码本身零返工、P0 一次修好，故 TM 判定不触发 senior 升级；如用户不同意可推翻。
+
+## 迁移整理记一笔（2026-09-23，整理工）
+
+- 模板源：`2026-09-09 丨 MAC 丨 ORCA V2.1 治理模板 丨 分发版-2026-09-11/老项目迁移模板包`；本 HANDOFF 为实质现役交接，按"禁覆盖"留原地，仅附记（5.5 首版义务以本记履行）。
+- 铺包：新放 62 项（迁移整理提示词/sop 4 件/docs-prompts/docs-templates/scripts-decision+model）；模板覆盖 7 项（AGENTS/编排者提示词/推进协议/roles 4 卡，旧版均备 `.旧版-2026-09-13`）；跳过 23 项（已一致）；`USER_MODEL_OVERRIDE.md` 实文件已备并软链指母版真源。
+- 故意未动：`docs/model/` 两账本（真实记录，模板仅示例行；示例行本就无，5.6 无需删）、README/经验一句话、全部业务与项目文档。
+- 基线：lint 0 errors（9 warnings）/ tsc 0 / jest 9 suites·43 tests 全过 → PASS；剩 P0：无（沿用本 HANDOFF 原有结论）。
+- CHANGE_REQUEST：NONE。下一步：用户下指令才开工（仍不 commit 不 push）。
+- 归位表：`docs/templates/归位表.md`。
+
+---
+
+## 2026-09-27 增补（编排者落盘；三机最终 release 实测 + 交接状态纠偏）
+
+- 阶段：仍 `DEVELOP`，Stage ID = 夜间补光灯 V2.1 多语言支持；`CHANGE_REQUEST: NONE`。
+- 顶部状态块（Captured 2026-09-20、V1.1、双机 release 验证）**已过期**，本节为准。
+- 本轮做了哪件事（唯一一件事）：把最终 `app-release.apk`（2026-09-27 11:34 构建，96,376,226 B）**覆盖安装到三台手机**并逐台冷启实测，解除 `docs/qa/V2.1-03-qa.md` 记的 L-03/L-04/L-15/L-17 阻塞。
+  - 装包前状态：D1 已是 11:35 同包；D2 是 10:33 的旧构建；D3 还是 09-19 的 V1.0 包。
+  - 装包后：三台统一同一 release 产物，全部 `install -r -d` Success。
+- 实测结论：**三机零 P0**。画布/面板/8 预设/两条滑条/色轮/设置页/语言实时切换/语言冷启保持/5 秒自动收起/恢复暖白默认，逐台截图留证。详见 `docs/qa/V2.1-04-qa.md`，证据图 `docs/qa/screenshots-v2.1-04/`。
+- 阻塞根因（不是本项目缺陷，已定性）：①设备上别的 App（拉伸流程类，D1 `night.party.app`、D2 `com.landedazi.app`、D3 某拉伸流程 App）被系统周期性拉到前台，QA 才会 dump 到「我的流程/动作库」；②面板 5 秒自动收起会打断 QA 的分步命令。处置：每步前 `am start` 拉回前台 + 多步操作合并进一条 `adb shell`。
+- 两项**未覆盖**（非 P0，按用户口径不清数据）：「无本地偏好时按设备语言首启」的干净态首启；D1 现存 `en` 偏好，故不能再当 zh-CN 无偏好样本。
+- 设备收尾：三台均恢复暖白默认、面板关闭；D2 语言切回简体中文；未改系统语言、未清数据。
+- 工作区：**仍未 commit、未 push**（HEAD 仍是 09-20 的 `f9f5648`；工作区 30 个文件改动 + 本轮新增 `docs/qa/V2.1-04-qa.md` 与 `docs/qa/screenshots-v2.1-04/`）。要发版/提交需用户明确指令。
+- 下一步（Next Single Action）：无 P0，等用户指令。可选：①commit+push V2.1 并发版；②派 supervisor 对 V2.1-04 结论复检；③补做「清数据首启按设备语言」那一项。
+
+### 2026-09-27 追加（同日晚，用户令「全部完成」）
+
+- 用户拍板三项全做：①清数据补测首启判定 ②supervisor 复检 ③commit+push V2.1 并发版。
+- ①已完成：`pm clear` D2（zh-CN）/ D3（en-US）后冷启，D2 全中文且设置页 `简体中文` 选中、D3 全英文 → **L-01/L-02 干净态首启 PASS**，V2.1-03 的四条 NOT VERIFIED 全部有据。副作用：两台 App 数据回到初始态（用户已授权）。详见 `docs/qa/V2.1-04-qa.md` §2.1 与新增证据图 `d2clean*.png` / `d3clean.png`。
+- 三门禁（2026-09-27 实跑）：`npm run lint` → 0 errors / 9 warnings（均在 `scripts/decision/test-filter.mjs`，历史项）；`npx tsc --noEmit` → exit 0；`npm test -- --runInBand` → **11 suites / 66 tests 全过**。
+
+### 2026-09-27 追加二：supervisor 打回 → 返工闭环（12:50–13:30）
+
+- supervisor 复检 V2.1-04 判 **FAIL**，4 条 blocking：①结论夸大（把 L-15/L-16 也说成已解除）②`d2clean*/d3clean` 与旧截图 md5 相同，疑非新证据 ③根因里具体包名无归档证据 ④V2.1 轮两账本零记录。独立核对通过的部分：三门禁全过、APK md5/大小一致、三台 `lastUpdateTime` 为当轮、未动设备。
+- 返工已完成（`docs/qa/V2.1-04-qa.md` §2.2/§2.3/§4/§7）：
+  - 用**可证伪链条**替代截图自证：颜色强度点 46% → 冷启仍 46%（证明持久化生效）→ `pm clear` → 回 100% 且中文（证明清数据生效＋首启按设备语言）。新证据 `d2clean-L04-proof.png`。两张 clean 截图与旧图字节相同属预期（首启状态本就相同），已在文档写明。
+  - 逐项定性：L-04 PASS、L-17 PASS（3 轮常规＋1 轮立刻 kill 均以末次为准，另有 1 次未复现异常记 P3）、**L-03 仍 NOT VERIFIED**（需改手机系统语言，未获授权不做）、**L-15 仍 NOT VERIFIED**（release 包不可 `run-as` 注入非法存储值）、L-16 静态 PASS／运行时未验，并判定 **V21-QA-05 为误报**（`app/settings.tsx:79-89` 确有 `language-save-error` + `retrySave` 渲染）。
+  - 根因证据降级为口径声明（包名读数是会话观测、未落盘），并另补「排除装错包」三项可核对读数。
+  - 账本按 AGENTS.md 补记 V2.1 各派行（模型不可考的两行如实写「未记录」，不编），`check-ledger` 通过。
+- 仍未闭环（需用户单独授权）：L-03、L-15、L-16 运行时。

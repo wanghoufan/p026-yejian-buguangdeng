@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 及以下：用 windowBackground 的 layer-list 画启动画面。
+     图标项必须显式给出 width/height：@mipmap/ic_launcher 是自适应图标，
+     自身没有固有大小时 LayerDrawable 会按容器尺寸铺满整屏。 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:drawable="@color/splashscreen_background"/>
+  <item
+    android:width="192dp"
+    android:height="192dp"
+    android:gravity="center"
+    android:drawable="@mipmap/ic_launcher"/>
+</layer-list>

@@ -9,6 +9,22 @@ const RADIUS = SIZE / 2;
 // 去掉 PanResponder 的手势包装层，直接调用组件自己的回调做行为验证。
 jest.spyOn(PanResponder, 'create').mockImplementation((config: any) => ({ panHandlers: config }) as any);
 
+// 真实词典 + 可切换 locale：验证无障碍标签确实走词条而非硬编码。
+let mockLocale: 'zh-CN' | 'en' = 'zh-CN';
+jest.mock('../src/hooks/useLanguage', () => {
+  const { translate } = jest.requireActual('../src/i18n');
+  return {
+    useLanguage: () => ({
+      locale: mockLocale,
+      setLocale: jest.fn(),
+      t: (key: string) => translate(mockLocale, key),
+      isReady: true,
+      saveError: false,
+      retrySave: jest.fn(),
+    }),
+  };
+});
+
 function mount(color: string, onChange = jest.fn(), onEnd = jest.fn()) {
   let tree!: ReactTestRenderer;
   act(() => {
@@ -112,5 +128,19 @@ describe('ColorWheelPanel (T039–T041)', () => {
     expect(onChange).not.toHaveBeenCalled();
     expect(onEnd).not.toHaveBeenCalled();
     expect(indicatorStyle(tree).left).toBeCloseTo(SIZE - 20, 0);
+  });
+
+  test('无障碍名称取词条且随语言切换', () => {
+    mockLocale = 'zh-CN';
+    const onChange = jest.fn();
+    let tree!: ReactTestRenderer;
+    act(() => { tree = create(<ColorWheelPanel color="#FFF2E2" onChange={onChange} />); });
+    expect(tree.root.findByProps({ testID: 'wheel-ring' }).props.accessibilityLabel).toBe('色相色盘');
+
+    mockLocale = 'en';
+    act(() => { tree.update(<ColorWheelPanel color="#FFF2E2" onChange={onChange} />); });
+    expect(tree.root.findByProps({ testID: 'wheel-ring' }).props.accessibilityLabel).toBe('Hue color wheel');
+
+    mockLocale = 'zh-CN';
   });
 });

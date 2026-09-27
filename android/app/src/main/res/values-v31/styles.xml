@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Android 12+（API 31）由系统 SplashScreen API 绘制启动画面：
+       只认 windowSplashScreen* 属性，windowBackground 不再单独决定画面内容。
+       这里显式指定背景色与居中图标，保证 Android 12+ 也显示项目图标。 -->
+  <style name="Theme.App.SplashScreen" parent="AppTheme">
+    <item name="android:windowBackground">@drawable/splashscreen_layer</item>
+    <item name="android:windowSplashScreenBackground">@color/splashscreen_background</item>
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+  </style>
+</resources>
