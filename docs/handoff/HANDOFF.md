@@ -242,3 +242,14 @@
   - 根因证据降级为口径声明（包名读数是会话观测、未落盘），并另补「排除装错包」三项可核对读数。
   - 账本按 AGENTS.md 补记 V2.1 各派行（模型不可考的两行如实写「未记录」，不编），`check-ledger` 通过。
 - 仍未闭环（需用户单独授权）：L-03、L-15、L-16 运行时。
+
+### 2026-09-27 追加三：三项全部完成（13:30–13:40）
+
+- ③ 清数据补测：已完成，见上节（PASS，证据 `d2clean-L04-proof.png` 等）。
+- ② supervisor 复检：**第一轮 FAIL → 返工 → 第二轮 PASS**（4 条 blocking 逐条闭环，详见上节与 `docs/qa/V2.1-04-qa.md` §7）。账本两处 `check-ledger` 均 LEDGER-OK。
+- ① 提交与发版：**已做**。
+  - commit `32ca68b`（135 files, +8723/-69），已 `git push origin main`；远端 `refs/heads/main` = `32ca68b`，仓库 https://github.com/wanghoufan/p026-yejian-buguangdeng 返回 200。
+  - GitHub Release 已发布：**`v2.1.0`** → https://github.com/wanghoufan/p026-yejian-buguangdeng/releases/tag/v2.1.0 ，并挂 `app-release.apk`（96,376,226 B，md5 `2d508c4e…`）。
+  - ⚠️ 口径提示：发布 tag 用 `v2.1.0`（对齐 V2.1 多语言），但**包内 `versionName` 仍是 `1.0.0`**、`versionCode` 未升。已在 release notes 写明。若要一致，需改 `app.json` 版本号并重新出包发版——**未擅自改**，等用户决定。
+- 本轮把 `docs/qa/screenshots-v2.1-04/`（19 张证据图）一并入库，仓库体积增加约 1.6 MB。
+- 剩 P0：**0 条**。仍未闭环的只有 L-03 / L-15 / L-16 运行时（需用户分别授权「改某台手机系统语言」与「装可 run-as 的 debug 包」）。
