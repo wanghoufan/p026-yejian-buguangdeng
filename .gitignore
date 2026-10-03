@@ -6,3 +6,6 @@ android/.gradle/
 .kotlin/
 *.log
 .DS_Store
+
+# ORCA 迁移备份（回滚用，勿入库）
+*.旧版-2026-09-29
