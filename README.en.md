@@ -2,6 +2,8 @@
 
 [简体中文](./README.md) | English
 
+![Preset color panel (real app screen)](./docs/screenshots/preset-colors.png)
+
 Night Fill Light turns a second Android phone into a standalone fill light: the main phone shoots, the second phone emits light. No pairing, no remote control. Open the app for a full-screen soft light; tap to adjust, idle 5 seconds to dismiss.
 
 ## What it does
@@ -14,8 +16,6 @@ Night Fill Light turns a second Android phone into a standalone fill light: the 
 - One-tap reset: back to the warm-white defaults.
 - Landscape support: no crash on rotation, the landscape panel content scrolls.
 - Local-first: state stays on the phone. No account, no pairing, no network (the release build requests zero permissions).
-
-![Preset color panel](./docs/screenshots/preset-colors.png)
 
 ![Color intensity and screen brightness](./docs/screenshots/sliders.png)
 
