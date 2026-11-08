@@ -1,79 +1,58 @@
 # Night Fill Light
 
-[简体中文](./README.md) | English
+Turn a spare phone into a fill light you can use instantly: open the app for a full-screen soft light, tap once for the color wheel and brightness, then put it away when the shot is done.
 
-![Preset color panel (real app screen)](./docs/screenshots/preset-colors.png)
+[简体中文](./README.md)
 
-Night Fill Light turns a second Android phone into a standalone fill light: the main phone shoots, the second phone emits light. No pairing, no remote control. Open the app for a full-screen soft light; tap to adjust, idle 5 seconds to dismiss.
+## What it is
+
+An offline, login-free fill-light app for Android, positioned as a "second-phone companion": the main phone shoots, the other phone lights.
+
+It opens straight into a full-screen lighting canvas—no welcome screen, home page, or login. No network access and no unrelated permissions.
 
 ## What it does
 
-- Full-screen light canvas: usable on launch, warm-white default (`#FFF2E2`), keeps the screen awake.
-- 8 preset colors: warm white / neutral white / cool white / cream / peach pink / rose pink / ambient purple / ice blue, applied on tap.
-- Custom color: pick any color from the HSV color wheel.
-- Two adjustments: color intensity and in-app screen brightness, each 0–100%.
-- Auto-dismiss: the panel closes after 5 seconds without interaction, so it never blocks the light.
-- One-tap reset: back to the warm-white defaults.
-- Landscape support: no crash on rotation, the landscape panel content scrolls.
-- Local-first: state stays on the phone. No account, no pairing, no network (the release build requests zero permissions).
+- **Light on open**: the first launch defaults to warm white, 100% color intensity, and 100% app brightness, with the control panel collapsed.
+- **Full-screen immersion**: the color covers the usable screen, with the status and navigation bars hidden; the screen stays awake while lighting.
+- **Tap to reveal the panel**: tapping the canvas opens a bottom frosted-glass panel; tap outside or drag down to close, and adjusting controls never closes it accidentally.
+- **Eight presets**: warm white, neutral white, cool white, cream, peach pink, rose pink, ambient purple, and ice blue, as a 4×2 grid that applies instantly.
+- **Custom color wheel**: continuous HSV picking with the canvas updating live while you drag.
+- **Two sliders**: color intensity (interpolation from white to the target color) and app screen brightness are separate; brightness affects only the current app, never the system-wide setting.
+- **Remembered settings**: the last color, intensity, brightness, and tab return on the next launch, with the panel still collapsed.
+- **Reset**: one tap back to warm white / 100% / 100%.
 
-![Color intensity and screen brightness](./docs/screenshots/sliders.png)
+## Build and run
 
-## Quickest start (install on your phone)
-
-The release build bundles its own UI code and works offline. Build it and install (prerequisites below):
-
-```bash
-cd android
-./gradlew :app:assembleRelease --no-daemon --no-watch-fs
-adb install -r app/build/outputs/apk/release/app-release.apk
-```
-
-## Build from source
-
-Prerequisites: Node.js (see `package.json`), JDK 17, Android SDK (including platform-tools).
+Requires Node.js 20+ and Android Studio; the target is an Android phone.
 
 ```bash
 npm install
-npm start
+npm test              # jest unit tests
+npm run typecheck
+npx expo run:android  # build and install on a connected device
 ```
 
-Scan the code with Expo Go, or use an Android emulator / device. Saving code hot-reloads the app.
+The current version is `1.0.0` in `app.json`; upgrade in place to keep settings.
 
-Quality gates (run before committing):
+## Data and privacy
 
-```bash
-npm run lint && npm run typecheck && npm test
+- Settings live on-device only; no network, no login, nothing uploaded.
+- No camera, location, contacts, or other unrelated permissions; brightness applies only to this app.
+
+## Known limitations
+
+- **Bilingual Chinese/English UI is still planned** (`docs/pm/PRODUCT_PLAN_V2.1.md`, awaiting human review); the UI is currently Chinese.
+- Android only; iOS is not implemented.
+- Maximum screen brightness depends on the system and vendor power policies, so some devices may not reach the top level.
+
+## Layout
+
+```text
+app/        # lighting canvas, control panel, and settings
+assets/     # icons and launch resources
+__tests__/  # component and logic tests
+docs/       # plans, QA, handoff, governance
+android/    # native project
 ```
 
-### Release build notes
-
-See "Quickest start". Additional notes:
-
-- If you only changed Expo config such as `app.json` and the `android/` directory has no matching change yet, run `npx expo prebuild --platform android` first.
-- The release build requests 0 permissions (a project requirement); the network permission needed for debugging is scoped to `android/app/src/debug/` and does not affect release.
-- Package name `com.filllight.nightlamp`, launcher name「夜间补光灯」.
-
-### Debug build cannot reach Metro
-
-The debug build loads its UI from Metro on your computer. On a red `Unable to load script` screen:
-
-```bash
-npx expo start --port 8081   # do not add CI=1, it disables Metro file watching
-adb -s <phone-serial> reverse tcp:8081 tcp:8081
-```
-
-Then cold-start the app on the phone (swipe it away first, then open). After every replug, run `adb -s <serial> reverse --list` to confirm the 8081 mapping is still there.
-
-On Xiaomi phones, the first USB install needs an on-phone confirmation (Developer options → USB install); it cannot be bypassed from the computer.
-
-## Docs
-
-- Store copy (Chinese): [`docs/store-copy.md`](./docs/store-copy.md)
-- Product plan (Chinese): [`docs/pm/PRODUCT_PLAN_V1.1.md`](./docs/pm/PRODUCT_PLAN_V1.1.md)
-- Test records: [`docs/qa/`](./docs/qa/)
-- Developer handoff, read first when taking over (Chinese): [`docs/handoff/HANDOFF.md`](./docs/handoff/HANDOFF.md)
-
-## Tech notes
-
-Single-page app with Expo (~57) + React Native + TypeScript, one home route via `expo-router`. State lives in `src/state`, the panel / color wheel / sliders in `src/components`, design tokens in `src/theme`. The color-wheel texture is generated with `npm run assets:wheel`.
+See `docs/pm/PRODUCT_PLAN_V1.1.md` for scope and `docs/pm/PRODUCT_PLAN_V2.1.md` for the bilingual plan.
