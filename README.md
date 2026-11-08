@@ -4,6 +4,8 @@
 
 [English](./README.en.md)
 
+![夜间补光灯的预设颜色与控制面板](docs/images/control-sheet.png)
+
 ## 这是什么
 
 一个离线、免登录的 Android 补光 App，定位是「第二台手机伴侣」：主手机负责拍摄，另一台手机负责补光。

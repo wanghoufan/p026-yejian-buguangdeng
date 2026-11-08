@@ -4,6 +4,8 @@ Turn a spare phone into a fill light you can use instantly: open the app for a f
 
 [简体中文](./README.md)
 
+![Night fill light presets and control panel](docs/images/control-sheet.png)
+
 ## What it is
 
 An offline, login-free fill-light app for Android, positioned as a "second-phone companion": the main phone shoots, the other phone lights.
